@@ -256,15 +256,15 @@ class _BluetoothAppState extends State<BluetoothApp> {
                   Column(
                     children: <Widget>[
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.only(top: 5),
                         child: Text(
                           "ДОСТУПНЫЕ УСТРОЙСТВА",
-                          style: TextStyle(fontSize: 24, color: Colors.blue),
+                          style: TextStyle(fontSize: 15, color: Colors.blue),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -293,7 +293,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(7.0),
                         child: Card(
                           shape: RoundedRectangleBorder(
                             side: new BorderSide(
@@ -308,14 +308,14 @@ class _BluetoothAppState extends State<BluetoothApp> {
                           ),
                           elevation: _deviceState == 0 ? 4 : 0,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(4.0),
                             child: Row(
                               children: <Widget>[
                                 Expanded(
                                   child: Text(
                                     "РЕЖИМ:",
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 15,
                                       color: _deviceState == 0
                                           ? colors['neutralTextColor']
                                           : _deviceState == 1
@@ -350,7 +350,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(10),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -363,7 +363,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                             color: Colors.red,
                           ),
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 5),
                         RaisedButton(
                           elevation: 2,
                           child: Text("Настройки Bluetooth"),
@@ -371,11 +371,11 @@ class _BluetoothAppState extends State<BluetoothApp> {
                             FlutterBluetoothSerial.instance.openSettings();
                           },
                         ),
-                        SizedBox(height: 77),
+                        SizedBox(height: 7),
                         Text(
                           '$now flutter время',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.deepPurple,
                           ),
@@ -383,12 +383,12 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         Text(
                           '$formattedDate  форматированное время',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.deepPurple,
                           ),
                         ),
-                        SizedBox(height: 17),
+                        SizedBox(height: 1),
                         // Text(
                         //   formattedDate,
                         //   style: TextStyle(
@@ -397,7 +397,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         //     color: Colors.green,
                         //   ),
                         // ),
-                        SizedBox(height: 17),
+                        SizedBox(height: 1),
                         RaisedButton(
                           elevation: 2,
                           child: Text("Отослать время: 0 + formatted time;big time"),
@@ -408,7 +408,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         SizedBox(height: 17),
                         Text(_timeString,
                           style: TextStyle(
-                            fontSize: 99,
+                            fontSize: 55,
                             fontWeight: FontWeight.bold,
                             color: Colors.deepPurple,
                           ),
@@ -537,7 +537,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
   void _sendOnMessageToBluetooth() async {
     connection.output.add(utf8.encode("1" + "\r\n"));
     await connection.output.allSent;
-    show('режим СТАРТ');
+    show('послан режим СТАРТ');
     setState(() {
       _deviceState = 1; // device on
     });
@@ -548,7 +548,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
   void _sendOffMessageToBluetooth() async {
     connection.output.add(utf8.encode("2" + "\r\n"));
     await connection.output.allSent;
-    show('режим БОКС');
+    show('послан режим БОКС');
     setState(() {
       _deviceState = -1; // device off
     });
@@ -557,10 +557,11 @@ class _BluetoothAppState extends State<BluetoothApp> {
 
   void _sendTimeToBluetooth(String time, String now) async {
     print ("0"+ time + ";" + now +"\r\n");
+    show('Время отсылается'); // убрать в финальной версии
     connection.output.add(utf8.encode("0"+ time + ";" + now +"\r\n"));
     await connection.output.allSent;
 
-    show('режим ВРЕМЯ');
+    show('Время отослано');
     setState(() {
       _deviceState = -1; // device off
     });
