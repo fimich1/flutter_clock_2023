@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'functions.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Часы ОПКУ 1.2',
+      title: 'Часы ОПКУ 1.3',
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
@@ -167,7 +168,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text("Стартовые часы ОПКУ v1.1"),
+          title: Text("Стартовые часы ОПКУ v1.3"),
           backgroundColor: Colors.deepPurple,
           actions: <Widget>[
             FlatButton.icon(
@@ -374,17 +375,17 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         Text(
                           '$now flutter время',
                           style: TextStyle(
-                            fontSize: 35,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.green,
+                            color: Colors.deepPurple,
                           ),
                         ),
                         Text(
                           '$formattedDate  форматированное время',
                           style: TextStyle(
-                            fontSize: 35,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.green,
+                            color: Colors.deepPurple,
                           ),
                         ),
                         SizedBox(height: 17),
@@ -407,7 +408,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         SizedBox(height: 17),
                         Text(_timeString,
                           style: TextStyle(
-                            fontSize: 111,
+                            fontSize: 99,
                             fontWeight: FontWeight.bold,
                             color: Colors.deepPurple,
                           ),
@@ -567,9 +568,9 @@ class _BluetoothAppState extends State<BluetoothApp> {
   // Method to show a Snackbar,
   // taking message as the text
   Future show(
-    String message, {
-    Duration duration: const Duration(seconds: 3),
-  }) async {
+      String message, {
+        Duration duration: const Duration(seconds: 3),
+      }) async {
     await new Future.delayed(new Duration(milliseconds: 100));
     _scaffoldKey.currentState.showSnackBar(
       new SnackBar(
