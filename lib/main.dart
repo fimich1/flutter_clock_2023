@@ -402,8 +402,10 @@ class _BluetoothAppState extends State<BluetoothApp> {
                           elevation: 2,
                           child: Text("Отослать время: 0 + formatted time;big time"),
                           onPressed: () {
-                            _sendTimeToBluetooth(formattedDate,now.toString());
-                          },
+                            _connected
+                            ? _sendTimeToBluetooth(formattedDate,now.toString())
+                            : show('сначала выполните сопряжение!');
+                            },
                         ),
                         SizedBox(height: 17),
                         Text(_timeString,
