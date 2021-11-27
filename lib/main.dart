@@ -1,6 +1,7 @@
 // For performing some operations asynchronously
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 // For using PlatformException
 import 'package:flutter/services.dart';
@@ -14,9 +15,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Часы ОПКУ 1.2',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
       ),
       home: BluetoothApp(),
     );
@@ -60,8 +61,18 @@ class _BluetoothAppState extends State<BluetoothApp> {
   bool _connected = false;
   bool _isButtonUnavailable = false;
 
+  // ЧАСЫ Здесь менять формат даты/времени
+  String _formatDateTime(DateTime dateTime) {
+    return DateFormat('HH:mm:ss').format(dateTime);
+  }
+  String _timeString;
+
+
   @override
   void initState() {
+    // Здесь установлена периодичность перерисовки экрана по initstate
+    _timeString = _formatDateTime(DateTime.now());
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
     super.initState();
 
     // Get current state
@@ -130,7 +141,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
     try {
       devices = await _bluetooth.getBondedDevices();
     } on PlatformException {
-      print("Error");
+      print("Ошибка");
     }
 
     // It is an error to call [setState] unless [mounted] is true.
@@ -148,11 +159,15 @@ class _BluetoothAppState extends State<BluetoothApp> {
   // Now, its time to build the UI
   @override
   Widget build(BuildContext context) {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('HH:mm:ss');
+    String formattedDate = formatter.format(now);
+
     return MaterialApp(
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text("Flutter Bluetooth"),
+          title: Text("Стартовые часы ОПКУ v1.1"),
           backgroundColor: Colors.deepPurple,
           actions: <Widget>[
             FlatButton.icon(
@@ -161,7 +176,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                 color: Colors.white,
               ),
               label: Text(
-                "Refresh",
+                "Обновить",
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -175,7 +190,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                 // while the app is running, user can refresh
                 // the paired devices list.
                 await getPairedDevices().then((_) {
-                  show('Device list refreshed');
+                  show('Список устройств обновлен');
                 });
               },
             ),
@@ -200,7 +215,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        'Enable Bluetooth',
+                        'Активировать Bluetooth',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -242,7 +257,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Text(
-                          "PAIRED DEVICES",
+                          "ДОСТУПНЫЕ УСТРОЙСТВА",
                           style: TextStyle(fontSize: 24, color: Colors.blue),
                           textAlign: TextAlign.center,
                         ),
@@ -253,7 +268,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              'Device:',
+                              'Устройство:',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -267,9 +282,11 @@ class _BluetoothAppState extends State<BluetoothApp> {
                             RaisedButton(
                               onPressed: _isButtonUnavailable
                                   ? null
-                                  : _connected ? _disconnect : _connect,
+                                  : _connected
+                                      ? _disconnect
+                                      : _connect,
                               child:
-                              Text(_connected ? 'Disconnect' : 'Connect'),
+                                  Text(_connected ? 'Подключено' : 'Отключено'),
                             ),
                           ],
                         ),
@@ -282,8 +299,8 @@ class _BluetoothAppState extends State<BluetoothApp> {
                               color: _deviceState == 0
                                   ? colors['neutralBorderColor']
                                   : _deviceState == 1
-                                  ? colors['onBorderColor']
-                                  : colors['offBorderColor'],
+                                      ? colors['onBorderColor']
+                                      : colors['offBorderColor'],
                               width: 3,
                             ),
                             borderRadius: BorderRadius.circular(4.0),
@@ -295,14 +312,14 @@ class _BluetoothAppState extends State<BluetoothApp> {
                               children: <Widget>[
                                 Expanded(
                                   child: Text(
-                                    "DEVICE 1",
+                                    "РЕЖИМ:",
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: _deviceState == 0
                                           ? colors['neutralTextColor']
                                           : _deviceState == 1
-                                          ? colors['onTextColor']
-                                          : colors['offTextColor'],
+                                              ? colors['onTextColor']
+                                              : colors['offTextColor'],
                                     ),
                                   ),
                                 ),
@@ -310,13 +327,13 @@ class _BluetoothAppState extends State<BluetoothApp> {
                                   onPressed: _connected
                                       ? _sendOnMessageToBluetooth
                                       : null,
-                                  child: Text("ON"),
+                                  child: Text("1 : СТАРТ"),
                                 ),
                                 FlatButton(
                                   onPressed: _connected
                                       ? _sendOffMessageToBluetooth
                                       : null,
-                                  child: Text("OFF"),
+                                  child: Text("2 : БОКС"),
                                 ),
                               ],
                             ),
@@ -338,7 +355,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          "NOTE: If you cannot find the device in the list, please pair the device by going to the bluetooth settings",
+                          "Если список устройст пуст, выполните сопряжение в настройках Bluetooth",
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -348,10 +365,52 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         SizedBox(height: 15),
                         RaisedButton(
                           elevation: 2,
-                          child: Text("Bluetooth Settings"),
+                          child: Text("Настройки Bluetooth"),
                           onPressed: () {
                             FlutterBluetoothSerial.instance.openSettings();
                           },
+                        ),
+                        SizedBox(height: 77),
+                        Text(
+                          '$now flutter время',
+                          style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                        Text(
+                          '$formattedDate  форматированное время',
+                          style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                        SizedBox(height: 17),
+                        // Text(
+                        //   formattedDate,
+                        //   style: TextStyle(
+                        //     fontSize: 35,
+                        //     fontWeight: FontWeight.bold,
+                        //     color: Colors.green,
+                        //   ),
+                        // ),
+                        SizedBox(height: 17),
+                        RaisedButton(
+                          elevation: 2,
+                          child: Text("Отослать время: 0 + formatted time;big time"),
+                          onPressed: () {
+                            _sendTimeToBluetooth(formattedDate,now.toString());
+                          },
+                        ),
+                        SizedBox(height: 17),
+                        Text(_timeString,
+                          style: TextStyle(
+                            fontSize: 111,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
                         ),
                       ],
                     ),
@@ -370,7 +429,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
     List<DropdownMenuItem<BluetoothDevice>> items = [];
     if (_devicesList.isEmpty) {
       items.add(DropdownMenuItem(
-        child: Text('NONE'),
+        child: Text('ПУСТО'),
       ));
     } else {
       _devicesList.forEach((device) {
@@ -389,12 +448,12 @@ class _BluetoothAppState extends State<BluetoothApp> {
       _isButtonUnavailable = true;
     });
     if (_device == null) {
-      show('No device selected');
+      show('Нет подключенных устройств');
     } else {
       if (!isConnected) {
         await BluetoothConnection.toAddress(_device.address)
             .then((_connection) {
-          print('Connected to the device');
+          print('Подключено к устройству');
           connection = _connection;
           setState(() {
             _connected = true;
@@ -411,10 +470,10 @@ class _BluetoothAppState extends State<BluetoothApp> {
             }
           });
         }).catchError((error) {
-          print('Cannot connect, exception occurred');
+          print('Нет соединения, ошибка');
           print(error);
         });
-        show('Device connected');
+        show('Подключено успешно');
 
         setState(() => _isButtonUnavailable = false);
       }
@@ -464,12 +523,20 @@ class _BluetoothAppState extends State<BluetoothApp> {
     }
   }
 
+  void _getTime() {
+    final DateTime now = DateTime.now();
+    final String formattedDateTime = _formatDateTime(now);
+    setState(() {
+      _timeString = formattedDateTime;
+    });
+  }
+
   // Method to send message,
   // for turning the Bluetooth device on
   void _sendOnMessageToBluetooth() async {
     connection.output.add(utf8.encode("1" + "\r\n"));
     await connection.output.allSent;
-    show('Device Turned On');
+    show('режим СТАРТ');
     setState(() {
       _deviceState = 1; // device on
     });
@@ -478,20 +545,31 @@ class _BluetoothAppState extends State<BluetoothApp> {
   // Method to send message,
   // for turning the Bluetooth device off
   void _sendOffMessageToBluetooth() async {
-    connection.output.add(utf8.encode("0" + "\r\n"));
+    connection.output.add(utf8.encode("2" + "\r\n"));
     await connection.output.allSent;
-    show('Device Turned Off');
+    show('режим БОКС');
     setState(() {
       _deviceState = -1; // device off
     });
   }
 
+
+  void _sendTimeToBluetooth(String time, String now) async {
+    print ("0"+ time + ";" + now +"\r\n");
+    connection.output.add(utf8.encode("0"+ time + ";" + now +"\r\n"));
+    await connection.output.allSent;
+
+    show('режим ВРЕМЯ');
+    setState(() {
+      _deviceState = -1; // device off
+    });
+  }
   // Method to show a Snackbar,
   // taking message as the text
   Future show(
-      String message, {
-        Duration duration: const Duration(seconds: 3),
-      }) async {
+    String message, {
+    Duration duration: const Duration(seconds: 3),
+  }) async {
     await new Future.delayed(new Duration(milliseconds: 100));
     _scaffoldKey.currentState.showSnackBar(
       new SnackBar(
