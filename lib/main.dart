@@ -1,9 +1,9 @@
-// For performing some operations asynchronously
+// последнее изменение:      17.01
 import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
-// For using PlatformException
+// стандартные билилотеки
 import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Часы ОПКУ 1.3',
+      title: 'Часы ОПКУ 1.4',
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
@@ -66,8 +66,8 @@ class _BluetoothAppState extends State<BluetoothApp> {
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('HH:mm:ss').format(dateTime);
   }
-  String _timeString;
 
+  String _timeString;
 
   @override
   void initState() {
@@ -168,10 +168,18 @@ class _BluetoothAppState extends State<BluetoothApp> {
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text("Стартовые часы ОПКУ v1.3"),
+          title: Text("Стартовые часы ОПКУ v1.4"),
           backgroundColor: Colors.deepPurple,
           actions: <Widget>[
-            FlatButton.icon(
+            TextButton.icon(
+              onPressed: () async {
+                // So, that when new devices are paired
+                // while the app is running, user can refresh
+                // the paired devices list.
+                await getPairedDevices().then((_) {
+                  show('Список устройств обновлен');
+                });
+              },
               icon: Icon(
                 Icons.refresh,
                 color: Colors.white,
@@ -182,19 +190,11 @@ class _BluetoothAppState extends State<BluetoothApp> {
                   color: Colors.white,
                 ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              splashColor: Colors.deepPurple,
-              onPressed: () async {
-                // So, that when new devices are paired
-                // while the app is running, user can refresh
-                // the paired devices list.
-                await getPairedDevices().then((_) {
-                  show('Список устройств обновлен');
-                });
-              },
             ),
+            // shape: RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.circular(30),
+            // ),
+            // splashColor: Colors.deepPurple,
           ],
         ),
         body: Container(
@@ -280,7 +280,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                                   setState(() => _device = value),
                               value: _devicesList.isNotEmpty ? _device : null,
                             ),
-                            RaisedButton(
+                            ElevatedButton(
                               onPressed: _isButtonUnavailable
                                   ? null
                                   : _connected
@@ -324,13 +324,13 @@ class _BluetoothAppState extends State<BluetoothApp> {
                                     ),
                                   ),
                                 ),
-                                FlatButton(
+                                TextButton(
                                   onPressed: _connected
                                       ? _sendOnMessageToBluetooth
                                       : null,
                                   child: Text("1 : СТАРТ"),
                                 ),
-                                FlatButton(
+                                TextButton(
                                   onPressed: _connected
                                       ? _sendOffMessageToBluetooth
                                       : null,
@@ -364,8 +364,8 @@ class _BluetoothAppState extends State<BluetoothApp> {
                           ),
                         ),
                         SizedBox(height: 5),
-                        RaisedButton(
-                          elevation: 2,
+                        ElevatedButton(
+                          // elevation: 2,
                           child: Text("Настройки Bluetooth"),
                           onPressed: () {
                             FlutterBluetoothSerial.instance.openSettings();
@@ -398,23 +398,37 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         //   ),
                         // ),
                         SizedBox(height: 1),
-                        RaisedButton(
-                          elevation: 2,
-                          child: Text("Отослать время: 0 + formatted time;big time"),
+                        ElevatedButton(
+                          //elevation: 2,
+                          child: Text(
+                              "Отослать время: 0 + formatted time;big time"),
                           onPressed: () {
                             _connected
-                            ? _sendTimeToBluetooth(formattedDate,now.toString())
-                            : show('сначала выполните сопряжение!');
-                            },
+                                ? _sendTimeToBluetooth(
+                                    formattedDate, now.toString())
+                                : show('сначала выполните сопряжение!');
+                          },
                         ),
                         SizedBox(height: 17),
-                        Text(_timeString,
+                        Text(
+                          _timeString,
                           style: TextStyle(
                             fontSize: 55,
                             fontWeight: FontWeight.bold,
                             color: Colors.deepPurple,
                           ),
                         ),
+                        SizedBox(height: 17),
+                        Text(
+                          'здесь вставить поле с собщениями от часов',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+
+
                       ],
                     ),
                   ),
@@ -556,32 +570,44 @@ class _BluetoothAppState extends State<BluetoothApp> {
     });
   }
 
-
   void _sendTimeToBluetooth(String time, String now) async {
-    print ("0"+ time + ";" + now +"\r\n");
+    print("\$" + time + ";" + now + "\r\n");
     show('Время отсылается'); // убрать в финальной версии
-    connection.output.add(utf8.encode("0"+ time + ";" + now +"\r\n"));
+    connection.output.add(utf8.encode("\$" + time + ";" + now + "\r\n"));
     await connection.output.allSent;
 
-    show('Время отослано');
+    show("0" + time + ";" + now + "\r\n" 'отослано');
     setState(() {
       _deviceState = -1; // device off
     });
   }
-  // Method to show a Snackbar,
+
+  // показ уведомления внизу
   // taking message as the text
   Future show(
-      String message, {
-        Duration duration: const Duration(seconds: 3),
-      }) async {
+    String message, {
+    Duration duration: const Duration(seconds: 3),
+  }) async {
     await new Future.delayed(new Duration(milliseconds: 100));
-    _scaffoldKey.currentState.showSnackBar(
-      new SnackBar(
-        content: new Text(
-          message,
-        ),
-        duration: duration,
-      ),
+    print(message);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+             ),
     );
-  }
+    // _scaffoldKey.currentState.
+    // _scaffoldKey.currentState.showSnackBar(
+    //   new SnackBar(
+    //     content: new Text(
+    //       message,
+    //     ),
+    //     duration: duration,
+    //   ),
+    // );
+
+
+            }
+
+
 }
