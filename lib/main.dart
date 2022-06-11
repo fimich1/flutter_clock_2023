@@ -398,16 +398,20 @@ class _BluetoothAppState extends State<BluetoothApp> {
                         //   ),
                         // ),
                         SizedBox(height: 1),
-                        ElevatedButton(
-                          //elevation: 2,
-                          child: Text(
-                              "Отослать время: 0 + formatted time;big time"),
-                          onPressed: () {
-                            _connected
-                                ? _sendTimeToBluetooth(
-                                    formattedDate, now.toString())
-                                : show('сначала выполните сопряжение!');
-                          },
+                        Builder(
+                          builder: (context) {
+                            return ElevatedButton(
+                              //elevation: 2,
+                              child: Text(
+                                  "Отослать время: 0 + formatted time;big time"),
+                              onPressed: () {
+                                _connected
+                                    ? _sendTimeToBluetooth(
+                                        formattedDate, now.toString())
+                                    : show('сначала выполните сопряжение!');
+                              },
+                            );
+                          }
                         ),
                         SizedBox(height: 17),
                         Text(
@@ -427,8 +431,6 @@ class _BluetoothAppState extends State<BluetoothApp> {
                             color: Colors.deepPurple,
                           ),
                         ),
-
-
                       ],
                     ),
                   ),
@@ -589,25 +591,15 @@ class _BluetoothAppState extends State<BluetoothApp> {
     Duration duration: const Duration(seconds: 3),
   }) async {
     await new Future.delayed(new Duration(milliseconds: 100));
+    //_scaffoldKey.currentState.showSnackBar(
     print(message);
-
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-             ),
+      new SnackBar(
+        content: new Text(
+          message,
+        ),
+        duration: duration,
+      ),
     );
-    // _scaffoldKey.currentState.
-    // _scaffoldKey.currentState.showSnackBar(
-    //   new SnackBar(
-    //     content: new Text(
-    //       message,
-    //     ),
-    //     duration: duration,
-    //   ),
-    // );
-
-
-            }
-
-
+  }
 }

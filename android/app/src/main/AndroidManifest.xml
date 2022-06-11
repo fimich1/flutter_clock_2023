@@ -7,7 +7,7 @@
 
 
    <application
-        android:label="flutter_clock"
+        android:label="flutter_clock_v4"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
