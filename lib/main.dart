@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:flushbar/flushbar.dart';
 
 // стандартные билилотеки
 import 'package:flutter/services.dart';
@@ -34,7 +35,10 @@ class _BluetoothAppState extends State<BluetoothApp> {
   // Initializing the Bluetooth connection state to be unknown
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
   // Initializing a global key, as it would help us in showing a SnackBar later
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   // Get the instance of the Bluetooth
   FlutterBluetoothSerial _bluetooth = FlutterBluetoothSerial.instance;
   // Track the Bluetooth connection with the remote device
@@ -403,7 +407,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                             return ElevatedButton(
                               //elevation: 2,
                               child: Text(
-                                  "Отослать время: 0 + formatted time;big time"),
+                                  "Отослать время: \$ + formatted time;"),
                               onPressed: () {
                                 _connected
                                     ? _sendTimeToBluetooth(
@@ -575,10 +579,13 @@ class _BluetoothAppState extends State<BluetoothApp> {
   void _sendTimeToBluetooth(String time, String now) async {
     print("\$" + time + ";" + now + "\r\n");
     show('Время отсылается'); // убрать в финальной версии
-    connection.output.add(utf8.encode("\$" + time + ";" + now + "\r\n"));
-    await connection.output.allSent;
 
-    show("0" + time + ";" + now + "\r\n" 'отослано');
+ //здесь менять фотмат отсылаемой строки
+
+    connection.output.add(utf8.encode("\$" + time + ";\r\n"));
+    await connection.output.allSent;
+    show("0" + time + ';\r\n отослано');
+    //show("0" + time + ";" + now + "\r\n" 'отослано');
     setState(() {
       _deviceState = -1; // device off
     });
@@ -593,13 +600,37 @@ class _BluetoothAppState extends State<BluetoothApp> {
     await new Future.delayed(new Duration(milliseconds: 100));
     //_scaffoldKey.currentState.showSnackBar(
     print(message);
-    ScaffoldMessenger.of(context).showSnackBar(
-      new SnackBar(
-        content: new Text(
-          message,
-        ),
-        duration: duration,
+
+    Flushbar(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      message: message,
+      icon: Icon(
+        Icons.info_outline,
+        size: 28.0,
+        color: Colors.red,
       ),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 5),
+      leftBarIndicatorColor: Colors.red,
     );
+
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //         new SnackBar(
+    //     content: new Text(
+    //       message,
+    //     ),
+    //     duration: duration,
+    //   ),
+    // );
+
+    // final snackBar = SnackBar(content: Text(message));
+    // _scaffoldKey.currentState!.showSnackBar(snackBar);
+
   }
+
+
+
+
+
 }
