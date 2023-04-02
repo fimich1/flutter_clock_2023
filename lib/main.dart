@@ -407,7 +407,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
                             return ElevatedButton(
                               //elevation: 2,
                               child: Text(
-                                  "Отослать время: \$ + formatted time;"),
+                                  "Послать время: \$ + formatted time;"),
                               onPressed: () {
                                 _connected
                                     ? _sendTimeToBluetooth(
